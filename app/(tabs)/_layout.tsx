@@ -4,13 +4,23 @@ import { Ionicons } from '@expo/vector-icons';
 export default function TabsLayout() {
   return (
     <Tabs
-      initialRouteName="camera"  // ← ESTO ES LO QUE FALTABA (abre en cámara por defecto)
+      initialRouteName="camera"  // abre directo en cámara
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: '#10b981',
         tabBarInactiveTintColor: 'gray',
       }}
     >
+      {/* Ruta oculta: index existe pero NO aparece en la barra */}
+      <Tabs.Screen
+        name="index"
+        options={{
+          tabBarButton: () => null,  // ← Esto lo hace INVISIBLE en la tab bar
+          tabBarStyle: { display: 'none' },  // opcional: oculta completamente el ítem
+        }}
+      />
+
+      {/* Tus tabs visibles */}
       <Tabs.Screen
         name="camera"
         options={{
@@ -33,7 +43,9 @@ export default function TabsLayout() {
         name="trash"
         options={{
           title: 'Papelera',
-          tabBarIcon: ({ color, size }) => <Ionicons name="trash" size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="trash" size={size} color={color} />
+          ),
         }}
       />
     </Tabs>
