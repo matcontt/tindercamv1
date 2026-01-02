@@ -4,9 +4,10 @@ import { Ionicons } from '@expo/vector-icons';
 export default function TabsLayout() {
   return (
     <Tabs
+      initialRouteName="camera"  // ← ESTO ES LO QUE FALTABA (abre en cámara por defecto)
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#10b981', // verde
+        tabBarActiveTintColor: '#10b981',
         tabBarInactiveTintColor: 'gray',
       }}
     >
@@ -29,12 +30,12 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-  name="trash"
-  options={{
-    title: 'Papelera',
-    tabBarIcon: ({ color, size }) => <Ionicons name="trash" size={size} color={color} />,
-  }}
-/>
+        name="trash"
+        options={{
+          title: 'Papelera',
+          tabBarIcon: ({ color, size }) => <Ionicons name="trash" size={size} color={color} />,
+        }}
+      />
     </Tabs>
   );
 }
