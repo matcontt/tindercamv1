@@ -1,6 +1,7 @@
 // app/(tabs)/camera.tsx (actualizado)
 import React, { useState, useRef } from 'react';
-import { View, Text, TouchableOpacity, Alert, SafeAreaView } from 'react-native';
+import { View, Text, TouchableOpacity, Alert} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
 import { usePhotos } from '@/lib/contexts/PhotoContext';
