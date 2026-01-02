@@ -1,7 +1,7 @@
 // app/(tabs)/trash.tsx
 import React from 'react';
+import { View, Text, Image, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { View, Text, Image, FlatList, TouchableOpacity, Alert} from 'react-native';
 import { usePhotos } from '@/lib/contexts/PhotoContext';
 
 export default function Trash() {
@@ -20,7 +20,7 @@ export default function Trash() {
       <SafeAreaView className="flex-1 bg-gray-950 justify-center items-center px-8">
         <Text className="text-white text-4xl font-bold mb-6">Papelera vacía</Text>
         <Text className="text-gray-400 text-center text-lg leading-7">
-          Las fotos descartadas aparecen aquí por 7 días. Luego se eliminan automáticamente.
+          Las fotos que descartes aparecerán aquí durante 7 días antes de eliminarse automáticamente.
         </Text>
       </SafeAreaView>
     );
@@ -70,15 +70,19 @@ export default function Trash() {
 
   return (
     <SafeAreaView className="flex-1 bg-gray-950">
-      <View className="flex-row justify-between items-center px-6 pt-4 pb-3 border-b border-gray-800">
-        <Text className="text-white text-3xl font-bold">Papelera</Text>
-        <Text className="text-gray-400 text-base">({trashPhotos.length})</Text>
+      <View className="flex-row justify-between items-center px-6 pt-6 pb-4 border-b border-gray-800">
+        <Text className="text-white text-3xl font-bold tracking-tight">
+          Papelera
+        </Text>
+        <Text className="text-gray-400 text-lg mt-1">
+          ({trashPhotos.length})
+        </Text>
       </View>
 
       {trashPhotos.length > 0 && (
         <TouchableOpacity
           onPress={handleEmptyTrash}
-          className="mx-6 my-4 bg-rose-700 px-6 py-3 rounded-xl items-center shadow-md shadow-rose-900/30"
+          className="mx-6 my-4 bg-rose-700 px-6 py-4 rounded-xl items-center shadow-lg shadow-rose-900/30"
         >
           <Text className="text-white text-base font-semibold">Vaciar papelera</Text>
         </TouchableOpacity>
@@ -92,22 +96,33 @@ export default function Trash() {
         columnWrapperStyle={{ justifyContent: 'space-between', marginBottom: 8 }}
         renderItem={({ item }) => {
           const daysLeft = getDaysLeft(item.deletedAt);
+          const isUrgent = daysLeft <= 2;
           return (
-            <View className="flex-1 aspect-square px-2 relative">
+            <View className="flex-1 aspect-square px-2 relative rounded-2xl overflow-hidden bg-gray-900 border border-gray-800">
               <Image
                 source={{ uri: item.uri }}
-                className="w-full h-full rounded-2xl border border-gray-800 shadow-sm shadow-black/30"
+                className="w-full h-full"
                 resizeMode="cover"
               />
-              <View className="absolute top-2 right-2 bg-gray-800/80 px-2 py-1 rounded-full">
+              <View
+                className={`absolute top-3 right-3 px-3 py-1.5 rounded-full ${
+                  isUrgent ? 'bg-amber-600' : 'bg-gray-800/90'
+                }`}
+              >
                 <Text className="text-white text-xs font-medium">{daysLeft}d</Text>
               </View>
-              <View className="absolute bottom-2 right-2 flex-row space-x-2">
-                <TouchableOpacity onPress={() => handleRecover(item.id)} className="bg-emerald-600 p-2 rounded-full shadow-sm shadow-emerald-900/30">
-                  <Text className="text-white text-base">♻️</Text>
+              <View className="absolute bottom-3 right-3 flex-row space-x-3">
+                <TouchableOpacity
+                  onPress={() => handleRecover(item.id)}
+                  className="bg-emerald-700 p-3.5 rounded-full shadow-md shadow-emerald-900/30"
+                >
+                  <Text className="text-white text-xl">♻️</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleDelete(item.id)} className="bg-rose-700 p-2 rounded-full shadow-sm shadow-rose-900/30">
-                  <Text className="text-white text-base">🗑️</Text>
+                <TouchableOpacity
+                  onPress={() => handleDelete(item.id)}
+                  className="bg-rose-700 p-3.5 rounded-full shadow-md shadow-rose-900/30"
+                >
+                  <Text className="text-white text-xl">🗑️</Text>
                 </TouchableOpacity>
               </View>
             </View>

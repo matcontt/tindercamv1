@@ -1,4 +1,4 @@
-// app/(tabs)/camera.tsx (actualizado)
+// app/(tabs)/camera.tsx
 import React, { useState, useRef } from 'react';
 import { View, Text, TouchableOpacity, Alert} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -16,18 +16,18 @@ export default function CameraScreen() {
 
   if (!permission) {
     return (
-      <SafeAreaView className="flex-1 bg-black justify-center items-center">
-        <Text className="text-gray-200 text-xl">Solicitando permisos...</Text>
+      <SafeAreaView className="flex-1 bg-gray-950 justify-center items-center">
+        <Text className="text-gray-200 text-xl font-medium">Solicitando permisos...</Text>
       </SafeAreaView>
     );
   }
 
   if (!permission.granted) {
     return (
-      <SafeAreaView className="flex-1 bg-black justify-center items-center px-8">
-        <Text className="text-white text-2xl font-bold mb-6">Permiso requerido</Text>
-        <Text className="text-gray-400 text-center text-lg mb-8">
-          Necesitamos acceso a la cámara para tomar fotos
+      <SafeAreaView className="flex-1 bg-gray-950 justify-center items-center px-8">
+        <Text className="text-white text-3xl font-bold mb-6">Permiso requerido</Text>
+        <Text className="text-gray-300 text-center text-lg mb-8">
+          Necesitamos acceso a la cámara para que puedas capturar y decidir fotos
         </Text>
         <TouchableOpacity
           onPress={requestPermission}
@@ -51,7 +51,7 @@ export default function CameraScreen() {
         setDimensions({ width: photo.width, height: photo.height });
       }
     } catch (err) {
-      console.error(err);
+      console.error('Error al tomar foto:', err);
     }
   };
 
@@ -66,7 +66,7 @@ export default function CameraScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-black">
+    <SafeAreaView className="flex-1 bg-gray-950">
       {photoUri ? (
         <SwipeablePhotoCard
           uri={photoUri}
@@ -84,7 +84,7 @@ export default function CameraScreen() {
             </Text>
           </View>
 
-          {/* Botón de captura grande y centrado */}
+          {/* Botón de captura */}
           <View className="absolute bottom-12 left-0 right-0 items-center">
             <TouchableOpacity
               onPress={takePicture}

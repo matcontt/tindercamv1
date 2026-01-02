@@ -1,4 +1,4 @@
-// app/(tabs)/gallery.tsx (mejorado)
+// app/(tabs)/gallery.tsx
 import React from 'react';
 import { View, Text, Image, FlatList, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -43,11 +43,11 @@ export default function Gallery() {
         data={galleryPhotos}
         keyExtractor={(item) => item.id}
         numColumns={3}
-        contentContainerStyle={{ padding: 6, paddingBottom: 20 }}
-        columnWrapperStyle={{ justifyContent: 'space-between', marginBottom: 6 }}
+        contentContainerStyle={{ padding: 8, paddingBottom: 32 }}
+        columnWrapperStyle={{ justifyContent: 'space-between', marginBottom: 8 }}
         renderItem={({ item }) => (
           <TouchableOpacity
-            className="flex-1 aspect-square px-1"
+            className="flex-1 aspect-square px-2"
             onPress={() => router.push(`/photo/${item.id}`)}
           >
             <Image

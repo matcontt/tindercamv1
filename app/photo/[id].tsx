@@ -1,6 +1,7 @@
 // app/photo/[id].tsx
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, Alert, Dimensions } from 'react-native';
+import { View, Text, Image, TouchableOpacity, Alert, Dimensions, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { usePhotos } from '@/lib/contexts/PhotoContext';
 
@@ -11,24 +12,36 @@ export default function PhotoDetail() {
   const router = useRouter();
   const { galleryPhotos, trashPhotos, deletePhoto, recoverFromTrash } = usePhotos();
 
+  // Combinamos todas las fotos para encontrar la seleccionada
   const allPhotos = [...galleryPhotos, ...trashPhotos];
   const photo = allPhotos.find(p => p.id === id);
 
   if (!photo) {
     return (
-      <View className="flex-1 justify-center items-center bg-black">
-        <Text className="text-white text-2xl">Foto no encontrada</Text>
+      <SafeAreaView className="flex-1 bg-gray-950 justify-center items-center px-8">
+        <Text className="text-white text-3xl font-bold mb-6">Foto no encontrada</Text>
+        <Text className="text-gray-400 text-center text-lg mb-8">
+          La foto con ID {id} no está disponible en galería ni papelera
+        </Text>
         <TouchableOpacity
           onPress={() => router.back()}
-          className="mt-6 bg-blue-600 px-6 py-3 rounded-lg"
+          className="bg-emerald-600 px-10 py-5 rounded-2xl shadow-lg shadow-emerald-900/30"
         >
-          <Text className="text-white font-medium">Volver</Text>
+          <Text className="text-white text-lg font-semibold">Volver</Text>
         </TouchableOpacity>
-      </View>
+      </SafeAreaView>
     );
   }
 
   const isInTrash = trashPhotos.some(p => p.id === id);
+  const formattedDate = new Date(photo.timestamp).toLocaleString('es-ES', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 
   const handleDelete = () => {
     Alert.alert(
@@ -44,7 +57,8 @@ export default function PhotoDetail() {
             router.back();
           },
         },
-      ]
+      ],
+      { cancelable: true }
     );
   };
 
@@ -54,53 +68,64 @@ export default function PhotoDetail() {
   };
 
   return (
-    <View className="flex-1 bg-black">
-      {/* Foto grande con zoom (puedes agregar pinch-to-zoom después) */}
-      <Image
-        source={{ uri: photo.uri }}
-        className="w-full h-full"
-        resizeMode="contain"
-      />
-
-      {/* Overlay con info y acciones */}
-      <View className="absolute bottom-0 left-0 right-0 bg-black/70 p-6">
-        <Text className="text-white text-lg mb-2">
-          Tomada el {new Date(photo.timestamp).toLocaleDateString()}
-        </Text>
-
-        <View className="flex-row justify-around mt-4">
-          {isInTrash ? (
-            <>
-              <TouchableOpacity
-                onPress={handleRecover}
-                className="bg-green-600 px-6 py-3 rounded-lg flex-row items-center"
-              >
-                <Text className="text-white font-bold mr-2">♻️ Recuperar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={handleDelete}
-                className="bg-red-600 px-6 py-3 rounded-lg flex-row items-center"
-              >
-                <Text className="text-white font-bold mr-2">🗑️ Eliminar</Text>
-              </TouchableOpacity>
-            </>
-          ) : (
-            <TouchableOpacity
-              onPress={handleDelete}
-              className="bg-red-600 px-8 py-4 rounded-lg flex-row items-center"
-            >
-              <Text className="text-white font-bold text-lg mr-2">Eliminar</Text>
-            </TouchableOpacity>
-          )}
+    <SafeAreaView className="flex-1 bg-gray-950">
+      <ScrollView className="flex-1">
+        {/* Imagen principal */}
+        <View className="p-4">
+          <Image
+            source={{ uri: photo.uri }}
+            className="w-full h-[70vh] rounded-3xl border border-gray-800 shadow-2xl shadow-black/50"
+            resizeMode="contain"
+          />
         </View>
 
-        <TouchableOpacity
-          onPress={() => router.back()}
-          className="mt-6 bg-gray-700 px-6 py-3 rounded-lg items-center"
-        >
-          <Text className="text-white font-medium">Cerrar</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+        {/* Info y acciones */}
+        <View className="px-6 pb-10">
+          <Text className="text-white text-2xl font-bold mb-3">Detalles de la foto</Text>
+
+          <View className="bg-gray-900 rounded-2xl p-5 mb-6 border border-gray-800">
+            <Text className="text-gray-300 text-base mb-2">
+              <Text className="font-semibold text-white">Fecha:</Text> {formattedDate}
+            </Text>
+            <Text className="text-gray-300 text-base">
+              <Text className="font-semibold text-white">Estado:</Text> {isInTrash ? 'En papelera' : 'Guardada en galería'}
+            </Text>
+          </View>
+
+          <View className="flex-row space-x-4">
+            {isInTrash ? (
+              <>
+                <TouchableOpacity
+                  onPress={handleRecover}
+                  className="flex-1 bg-emerald-700 py-5 rounded-2xl items-center shadow-lg shadow-emerald-900/30"
+                >
+                  <Text className="text-white text-lg font-semibold">Recuperar a galería</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleDelete}
+                  className="flex-1 bg-rose-700 py-5 rounded-2xl items-center shadow-lg shadow-rose-900/30"
+                >
+                  <Text className="text-white text-lg font-semibold">Eliminar</Text>
+                </TouchableOpacity>
+              </>
+            ) : (
+              <TouchableOpacity
+                onPress={handleDelete}
+                className="flex-1 bg-rose-700 py-5 rounded-2xl items-center shadow-lg shadow-rose-900/30"
+              >
+                <Text className="text-white text-lg font-semibold">Eliminar de galería</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          <TouchableOpacity
+            onPress={() => router.back()}
+            className="mt-6 bg-gray-800 py-4 rounded-2xl items-center"
+          >
+            <Text className="text-gray-200 text-base font-medium">Cerrar</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
