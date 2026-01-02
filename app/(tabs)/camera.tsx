@@ -1,39 +1,27 @@
 // app/(tabs)/camera.tsx
 import React, { useState, useRef } from 'react';
-import { View, Text, TouchableOpacity, Alert} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { CameraView, useCameraPermissions } from 'expo-camera';
+import { View, Text, TouchableOpacity, Alert } from 'react-native';
+import { CameraView, useCameraPermissions, CameraType } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
 import { usePhotos } from '@/lib/contexts/PhotoContext';
 import SwipeablePhotoCard from '@/components/SwipeablePhotoCard';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function CameraScreen() {
   const { isGalleryFull, saveToGallery, moveToTrash, galleryPhotos } = usePhotos();
   const [permission, requestPermission] = useCameraPermissions();
   const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [facing, setFacing] = useState<CameraType>('back'); // Estado para flip
   const cameraRef = useRef<CameraView>(null);
 
-  if (!permission) {
-    return (
-      <SafeAreaView className="flex-1 bg-gray-950 justify-center items-center">
-        <Text className="text-gray-200 text-xl font-medium">Solicitando permisos...</Text>
-      </SafeAreaView>
-    );
-  }
-
+  if (!permission) return <Text>Solicitando permisos...</Text>;
   if (!permission.granted) {
     return (
-      <SafeAreaView className="flex-1 bg-gray-950 justify-center items-center px-8">
-        <Text className="text-white text-3xl font-bold mb-6">Permiso requerido</Text>
-        <Text className="text-gray-300 text-center text-lg mb-8">
-          Necesitamos acceso a la cámara para que puedas capturar y decidir fotos
-        </Text>
-        <TouchableOpacity
-          onPress={requestPermission}
-          className="bg-emerald-600 px-10 py-5 rounded-2xl shadow-lg shadow-emerald-900/30"
-        >
-          <Text className="text-white text-lg font-semibold">Permitir acceso</Text>
+      <SafeAreaView className="flex-1 bg-black justify-center items-center">
+        <Text className="text-white mb-4">Necesitamos permiso de cámara</Text>
+        <TouchableOpacity onPress={requestPermission} className="bg-blue-600 px-6 py-3 rounded">
+          <Text className="text-white">Permitir</Text>
         </TouchableOpacity>
       </SafeAreaView>
     );
@@ -41,17 +29,13 @@ export default function CameraScreen() {
 
   const takePicture = async () => {
     if (isGalleryFull) {
-      Alert.alert('Límite alcanzado', 'La galería está llena (15/15). Libera espacio para continuar.');
+      Alert.alert('Galería llena', 'Límite de 15 fotos alcanzado');
       return;
     }
-    try {
-      const photo = await cameraRef.current?.takePictureAsync({ quality: 0.8 });
-      if (photo) {
-        setPhotoUri(photo.uri);
-        setDimensions({ width: photo.width, height: photo.height });
-      }
-    } catch (err) {
-      console.error('Error al tomar foto:', err);
+    const photo = await cameraRef.current?.takePictureAsync({ quality: 0.8 });
+    if (photo) {
+      setPhotoUri(photo.uri);
+      setDimensions({ width: photo.width, height: photo.height });
     }
   };
 
@@ -65,8 +49,12 @@ export default function CameraScreen() {
     setPhotoUri(null);
   };
 
+  const flipCamera = () => {
+    setFacing(facing === 'back' ? 'front' : 'back');
+  };
+
   return (
-    <SafeAreaView className="flex-1 bg-gray-950">
+    <SafeAreaView className="flex-1 bg-black">
       {photoUri ? (
         <SwipeablePhotoCard
           uri={photoUri}
@@ -75,28 +63,23 @@ export default function CameraScreen() {
         />
       ) : (
         <>
-          <CameraView ref={cameraRef} style={{ flex: 1 }} facing="back" />
+          <CameraView ref={cameraRef} style={{ flex: 1 }} facing={facing} />
 
-          {/* Header con contador */}
-          <View className="absolute top-0 left-0 right-0 px-6 pt-14 pb-6 bg-gradient-to-b from-black/70 to-transparent">
-            <Text className="text-white text-xl font-semibold text-center">
-              Cámara ({galleryPhotos.length}/15)
-            </Text>
-          </View>
+          {/* Botón flip */}
+          <TouchableOpacity onPress={flipCamera} className="absolute top-12 right-6 bg-black/50 p-3 rounded-full">
+            <Ionicons name="camera-reverse" size={28} color="white" />
+          </TouchableOpacity>
 
-          {/* Botón de captura */}
           <View className="absolute bottom-12 left-0 right-0 items-center">
             <TouchableOpacity
               onPress={takePicture}
               disabled={isGalleryFull}
-              className={`w-24 h-24 rounded-full border-4 border-gray-300 justify-center items-center shadow-2xl shadow-black/50 ${
-                isGalleryFull ? 'opacity-50 bg-gray-600' : 'bg-white'
-              }`}
+              className={`w-20 h-20 rounded-full bg-white justify-center items-center ${isGalleryFull ? 'opacity-50' : ''}`}
             >
-              <View className={`w-20 h-20 rounded-full ${isGalleryFull ? 'bg-gray-700' : 'bg-white'}`} />
+              <View className="w-16 h-16 rounded-full bg-white" />
             </TouchableOpacity>
-            <Text className="text-gray-300 mt-4 text-base font-medium">
-              {isGalleryFull ? 'Galería llena' : 'Toca para capturar'}
+            <Text className="text-white mt-3 text-sm">
+              {galleryPhotos.length}/15
             </Text>
           </View>
         </>
