@@ -1,10 +1,12 @@
 // app/(tabs)/gallery.tsx
 import React from 'react';
 import { View, Text, Image, FlatList, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';  // ← ESTE IMPORT FALTABA
 import { usePhotos } from '@/lib/contexts/PhotoContext';
 
 export default function Gallery() {
   const { galleryPhotos, loading } = usePhotos();
+  const router = useRouter();  // Ahora sí está definido
 
   if (loading) {
     return (
@@ -34,7 +36,10 @@ export default function Gallery() {
         contentContainerStyle={{ padding: 4 }}
         columnWrapperStyle={{ justifyContent: 'space-between' }}
         renderItem={({ item }) => (
-          <TouchableOpacity className="flex-1 aspect-square p-1">
+          <TouchableOpacity
+            className="flex-1 aspect-square p-1"
+            onPress={() => router.push(`/photo/${item.id}`)}
+          >
             <Image
               source={{ uri: item.uri }}
               className="w-full h-full rounded-xl border border-gray-700"
