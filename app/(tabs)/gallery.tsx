@@ -9,16 +9,18 @@ export default function Gallery() {
   if (loading) {
     return (
       <View className="flex-1 justify-center items-center bg-gray-900">
-        <Text className="text-white text-xl">Cargando fotos...</Text>
+        <Text className="text-white text-xl font-medium">Cargando fotos...</Text>
       </View>
     );
   }
 
   if (galleryPhotos.length === 0) {
     return (
-      <View className="flex-1 justify-center items-center bg-gray-900">
-        <Text className="text-white text-2xl">No hay fotos guardadas aún</Text>
-        <Text className="text-gray-400 mt-2">Toma fotos y desliza para guardar</Text>
+      <View className="flex-1 justify-center items-center bg-gray-900 px-6">
+        <Text className="text-white text-3xl font-bold mb-4">Galería vacía</Text>
+        <Text className="text-gray-400 text-center text-lg">
+          Toma fotos en la cámara y desliza hacia la derecha para guardarlas aquí
+        </Text>
       </View>
     );
   }
@@ -30,19 +32,22 @@ export default function Gallery() {
         keyExtractor={(item) => item.id}
         numColumns={3}
         contentContainerStyle={{ padding: 4 }}
+        columnWrapperStyle={{ justifyContent: 'space-between' }}
         renderItem={({ item }) => (
           <TouchableOpacity className="flex-1 aspect-square p-1">
             <Image
               source={{ uri: item.uri }}
-              className="w-full h-full rounded-lg"
+              className="w-full h-full rounded-xl border border-gray-700"
               resizeMode="cover"
             />
           </TouchableOpacity>
         )}
         ListHeaderComponent={() => (
-          <Text className="text-white text-xl font-semibold p-4">
-            Galería ({galleryPhotos.length} fotos)
-          </Text>
+          <View className="p-4">
+            <Text className="text-white text-2xl font-bold">
+              Galería ({galleryPhotos.length} foto{galleryPhotos.length !== 1 ? 's' : ''})
+            </Text>
+          </View>
         )}
       />
     </View>
